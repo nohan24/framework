@@ -8,6 +8,7 @@ public class FrontServlet extends HttpServlet{
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
         out.println(req.getRequestURI());
+        out.println(req.getQueryString());
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
