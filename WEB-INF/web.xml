@@ -9,11 +9,11 @@
     <!-- Define servlets that are included in the example application -->
 
    <servlet>
-        <servlet-name>ProcessRequestServlet</servlet-name>
-        <servlet-class>process.ProcessRequestServlet</servlet-class>
+        <servlet-name>FrontServlet</servlet-name>
+        <servlet-class>etu2075.framework.servlet.FrontServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>ProcessRequestServlet</servlet-name>
+        <servlet-name>FrontServlet</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 </web-app>
