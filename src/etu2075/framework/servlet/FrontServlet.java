@@ -9,6 +9,7 @@ public class FrontServlet extends HttpServlet{
         PrintWriter out = res.getWriter();
         String url = req.getRequestURI();
         url = url.split("/")[url.split("/").length - 1];
+        out.println(url);
         out.println(req.getQueryString());
     }
 
