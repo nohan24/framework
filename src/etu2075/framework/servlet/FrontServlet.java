@@ -7,7 +7,9 @@ public class FrontServlet extends HttpServlet{
     protected void processRequest(HttpServletRequest req,HttpServletResponse res) throws IOException{
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
-        out.println(req.getRequestURI());
+        String url = req.getRequestURI();
+        url = url.split("/")[url.split("/").length - 1];
+        out.println(url);
         out.println(req.getQueryString());
     }
 
