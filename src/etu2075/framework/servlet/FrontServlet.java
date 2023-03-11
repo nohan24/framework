@@ -1,9 +1,12 @@
 package etu2075.framework.servlet;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import etu2075.framework.Mapping;
 import java.io.*;
+import java.util.HashMap;
 
 public class FrontServlet extends HttpServlet{
+    HashMap<String,Mapping> urlMapping;
     protected void processRequest(HttpServletRequest req,HttpServletResponse res) throws IOException{
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
