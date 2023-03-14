@@ -66,11 +66,8 @@ public class FrontServlet extends HttpServlet{
         String url = req.getRequestURI();
         url = url.split("/")[url.split("/").length - 1];
         try {
-            Class<?> act = Class.forName(urlMapping.get(url).getClassName());
-            out.println(urlMapping.get(url).getMethod());
-            String a =  (String) act.getDeclaredMethod("insert").invoke(null);
-            out.println("haha");
-            out.println(a);
+            Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
+            out.println(act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act).toString());
          } catch (Exception e) {
                 e.printStackTrace();
         }
