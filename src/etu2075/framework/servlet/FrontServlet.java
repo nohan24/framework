@@ -4,7 +4,6 @@ import javax.servlet.http.*;
 import annotation.Url;
 import etu2075.framework.Mapping;
 import java.io.*;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,7 +18,7 @@ public class FrontServlet extends HttpServlet{
     @Override
     public void init() throws ServletException {
         try {
-            for (Class c : inPackage("base")){
+            for (Class c : inPackage(getServletConfig().getInitParameter("model"))){
                 for (Method m : c.getDeclaredMethods()){
                     if(m.isAnnotationPresent(Url.class)){
                         urlMapping.put(m.getAnnotation(Url.class).url(), new Mapping(c.getName(), m.getAnnotation(Url.class).url().split("-")[1]));

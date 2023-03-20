@@ -1,4 +1,4 @@
-package base;
+package model;
 
 import annotation.Url;
 
