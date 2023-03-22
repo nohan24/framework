@@ -3,6 +3,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import etu2075.annotation.Url;
 import etu2075.framework.Mapping;
+import etu2075.framework.ModelView;
 import utils.PackageTool;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -31,11 +32,16 @@ public class FrontServlet extends HttpServlet{
         PrintWriter out = res.getWriter();
         String url = req.getRequestURI();
         url = url.split("/")[url.split("/").length - 1];
-        try {
-            Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
-            out.println(act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act).toString());
-         } catch (Exception e) {
-                e.printStackTrace();
+        out.println(url);
+        if(urlMapping.containsKey(url)){
+            try {
+                Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
+                ModelView mv = (ModelView)act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act);
+                RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView()) ;    
+                requestDispatcher.forward(req,res);
+            } catch (Exception e) {
+                    e.printStackTrace();
+            }
         }
     }
 
