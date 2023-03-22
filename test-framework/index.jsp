@@ -7,6 +7,6 @@
     <title>Document</title>
 </head>
 <body>
-    <p>jfkdlfjk</p>
+    <a href="process/emp-insert">Test</a>
 </body>
 </html>
