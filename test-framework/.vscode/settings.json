@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "d:\\ITU_S4\\framework\\fw.jar"
+    ]
+}
