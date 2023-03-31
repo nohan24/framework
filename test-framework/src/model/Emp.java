@@ -6,7 +6,7 @@ public class Emp {
     @Url(url="emp-insert")
     public ModelView insert(){
         ModelView mv = new ModelView();
-        mv.setView("../emplist.jsp");
+        mv.setView("emplis.jsp");
         return mv;
     }
 }

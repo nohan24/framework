@@ -6,6 +6,8 @@ javac -d ../bin etu2075/framework/servlet/*.java
 cd ..
 cd bin
 jar -cvf ../../fw.jar *
+copy D:\ITU_S4\framework\fw.jar D:\Tomcat\lib\fw.jar
+copy D:\ITU_S4\framework\fw.jar D:\Tomcat\webapps\test-framework\WEB-INF\lib\fw.jar
 cd ../../test-framework/src
 javac -d ../WEB-INF/classes model/*.java
 cd ..
