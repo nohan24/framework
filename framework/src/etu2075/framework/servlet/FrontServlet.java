@@ -32,12 +32,14 @@ public class FrontServlet extends HttpServlet{
         PrintWriter out = res.getWriter();
         String url = req.getRequestURI();
         url = url.split("/")[url.split("/").length - 1];
-        out.println(url);
         if(urlMapping.containsKey(url)){
             try {
                 Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
                 ModelView mv = (ModelView)act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act);
-                RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView()) ;    
+                for (String key : mv.getMv().keySet()) {
+                    req.setAttribute(key,mv.getMv().get(key));
+                }
+                RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());    
                 requestDispatcher.forward(req,res);
             } catch (Exception e) {
                     e.printStackTrace();
