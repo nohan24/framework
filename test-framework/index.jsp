@@ -7,6 +7,9 @@
     <title>Document</title>
 </head>
 <body>
-    <a href="emp-insert">Test</a>
+    <form action="emp-insert" method="post">
+        <input type="text" name="nom">
+        <button>Valider</button>
+    </form> 
 </body>
 </html>

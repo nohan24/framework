@@ -1,6 +1,8 @@
 <%@ page import ="java.util.List" %>
+<%@ page import ="model.Emp" %>
 <%
     List<String> lst = (List<String>)request.getAttribute("lst");
+    Emp e = (Emp)request.getAttribute("obj");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,10 +14,11 @@
 </head>
 <body>
     <h1>Hello World !!!!!</h1>
-    <%
+    <%  
         for(String s : lst){ %>
             <p><%= s %></p>
         <% }
+        out.print(e.getNom());
     %>
 </body>
 </html>

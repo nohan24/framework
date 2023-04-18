@@ -6,8 +6,11 @@ import etu2075.framework.Mapping;
 import etu2075.framework.ModelView;
 import utils.PackageTool;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FrontServlet extends HttpServlet{
     HashMap<String,Mapping> urlMapping = new HashMap<>();
@@ -27,6 +30,21 @@ public class FrontServlet extends HttpServlet{
         }
     }
 
+    private List<String> parameter(HttpServletRequest req, String cl) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+        Object act = Class.forName(urlMapping.get(cl).getClassName()).newInstance();
+        ArrayList<String> ret = new ArrayList<>();
+        for (Field f : act.getClass().getDeclaredFields()) {
+            if(req.getParameter(f.getName()) != null){
+                ret.add(f.getName());
+            }
+        }
+        return ret;
+    }
+
+    public String capitalize(String str){
+        return str.substring(0, 1).toUpperCase() + str.substring(1);  
+    }
+
     protected void processRequest(HttpServletRequest req,HttpServletResponse res) throws IOException{
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
@@ -35,7 +53,13 @@ public class FrontServlet extends HttpServlet{
         if(urlMapping.containsKey(url)){
             try {
                 Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
+                List<String> params = parameter(req, url);
+                for (String s : params) {
+                    Method m = act.getClass().getDeclaredMethod("set" + capitalize(s), Object.class);
+                    m.invoke(act, req.getParameter(s));
+                }
                 ModelView mv = (ModelView)act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act);
+                mv.getMv().put("obj", act);
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key,mv.getMv().get(key));
                 }
