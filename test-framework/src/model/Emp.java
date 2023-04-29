@@ -16,6 +16,20 @@ public class Emp {
         this.nom = nom.toString();
     }
 
+    @Url(url="emp-find",params = {"id","name","len"})
+    public ModelView find(Object id,Object name,Object len){
+        int o = Integer.parseInt(id.toString());
+        String n = name.toString();
+        ModelView mv = new ModelView();
+        mv.setView("emplis.jsp");
+        HashMap<String,Object> hash = new HashMap<>();
+        hash.put("lst", o);
+        hash.put("name", n);
+        hash.put("len", len);
+        mv.setMv(hash);
+        return mv;
+    }
+
     @Url(url="emp-insert")
     public ModelView insert(){
         ModelView mv = new ModelView();

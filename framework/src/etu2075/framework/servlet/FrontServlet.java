@@ -8,6 +8,8 @@ import utils.PackageTool;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +47,33 @@ public class FrontServlet extends HttpServlet{
         return str.substring(0, 1).toUpperCase() + str.substring(1);  
     }
 
+    public Object[] check_params(Object obj,String met,HttpServletRequest req){
+        ArrayList<Object> ret = new ArrayList<>();
+        for(Method m : obj.getClass().getDeclaredMethods()){
+            if(m.isAnnotationPresent(Url.class)){
+                if(m.getName().equals(met)){
+                    String[] params = m.getAnnotation(Url.class).params();
+                    for (String s : params) {
+                        if(req.getParameter(s) != null){
+                            ret.add(req.getParameter(s));
+                        }
+                    }
+                }
+            }
+        }
+        if(ret.size() > 0)return ret.toArray();
+        return null;
+    }
+
+    public Class[] getParams(int count){
+        Class[] ret = new Class[count];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = Object.class;
+        }
+        if(count >  0)return ret;
+        return null;
+    }
+
     protected void processRequest(HttpServletRequest req,HttpServletResponse res) throws IOException{
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
@@ -53,12 +82,13 @@ public class FrontServlet extends HttpServlet{
         if(urlMapping.containsKey(url)){
             try {
                 Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
+
                 List<String> params = parameter(req, url);
                 for (String s : params) {
                     Method m = act.getClass().getDeclaredMethod("set" + capitalize(s), Object.class);
                     m.invoke(act, req.getParameter(s));
                 }
-                ModelView mv = (ModelView)act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod()).invoke(act);
+                ModelView mv = (ModelView)act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod(),getParams(check_params(act, urlMapping.get(url).getMethod(),req).length)).invoke(act,check_params(act, urlMapping.get(url).getMethod(),req));
                 mv.getMv().put("obj", act);
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key,mv.getMv().get(key));
