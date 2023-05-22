@@ -1,4 +1,4 @@
-package utils;
+package etu2075;
 
 public class FileUpload {
     String name;

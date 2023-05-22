@@ -1,6 +1,9 @@
 package etu2075.framework.servlet;
 import javax.servlet.*;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
+
+import etu2075.FileUpload;
 import etu2075.annotation.Url;
 import etu2075.framework.Mapping;
 import etu2075.framework.ModelView;
@@ -11,9 +14,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.http.HttpRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+@MultipartConfig
 public class FrontServlet extends HttpServlet{
     HashMap<String,Mapping> urlMapping = new HashMap<>();
 
@@ -93,6 +98,22 @@ public class FrontServlet extends HttpServlet{
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key,mv.getMv().get(key));
                 }
+
+                try {
+                    Collection<Part> parts =  req.getParts();
+                    if(parts.size() > 0){
+                        for(Field f : act.getClass().getDeclaredFields()){
+                            if (f.getType() == etu2075.FileUpload.class){
+                                Method m = act.getClass().getDeclaredMethod("setFu", f.getType());
+                                Object obj = fileTraitement(parts, f);
+                                m.invoke(act, obj);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    out.println(e);
+                }
+
                 RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());    
                 requestDispatcher.forward(req,res);
             } catch (Exception e) {
@@ -100,6 +121,45 @@ public class FrontServlet extends HttpServlet{
             }
         }
     }
+
+    protected FileUpload fileTraitement(Collection<Part> files, Field field){
+        FileUpload file = new FileUpload();
+        String name = field.getName();
+        boolean exists = false;
+        Part filepart = null;
+        for( Part part : files ){
+            if(part.getName().equals(name) ){
+                filepart = part;
+                exists = true;
+                break;
+            }
+        }
+        try(InputStream io = filepart.getInputStream()){
+            ByteArrayOutputStream buffers = new ByteArrayOutputStream();
+            byte[] buffer = new byte[(int)filepart.getSize()];
+            int read;
+            while( ( read = io.read( buffer , 0 , buffer.length )) != -1 ){
+                buffers.write(buffer , 0, read);
+            }
+            file.setName(this.fileName(filepart));
+            file.setBytes(buffers.toByteArray());
+            return file;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String fileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] parts = contentDisposition.split(";");
+        for (String partStr : parts) {
+            if (partStr.trim().startsWith("filename"))
+                return partStr.substring(partStr.indexOf('=') + 1).trim().replace("\"", "");
+        }
+        return null;
+    }
+
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
         processRequest(req, res);

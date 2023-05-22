@@ -2,11 +2,13 @@ package model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import etu2075.FileUpload;
 import etu2075.annotation.Url;
 import etu2075.framework.ModelView;
 
 public class Emp {
     String nom;
+    FileUpload fu;
 
     public String getNom() {
         return nom;
@@ -14,6 +16,14 @@ public class Emp {
 
     public void setNom(Object nom) {
         this.nom = nom.toString();
+    }
+
+    public void setFu(FileUpload fu) {
+        this.fu = fu;
+    }
+
+    public FileUpload getFu() {
+        return fu;
     }
 
     @Url(url="emp-find",params = {"id","name","len"})
