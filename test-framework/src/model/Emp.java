@@ -40,7 +40,7 @@ public class Emp {
         return mv;
     }
 
-    @Url(url="emp-insert")
+    @Url(url="emp-insert",params= {})
     public ModelView insert(){
         ModelView mv = new ModelView();
         mv.setView("emplis.jsp");

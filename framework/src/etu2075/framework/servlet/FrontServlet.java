@@ -41,10 +41,12 @@ public class FrontServlet extends HttpServlet{
         Object act = Class.forName(urlMapping.get(cl).getClassName()).newInstance();
         ArrayList<String> ret = new ArrayList<>();
         for (Field f : act.getClass().getDeclaredFields()) {
-            if(req.getParameter(f.getName()) != null){
-                ret.add(f.getName());
+            if (f.getType() != etu2075.FileUpload.class){
+                if(req.getParameter(f.getName()) != null){
+                    ret.add(f.getName());
+                }
             }
-        }
+            }
         return ret;
     }
 
@@ -67,7 +69,7 @@ public class FrontServlet extends HttpServlet{
             }
         }
         if(ret.size() > 0)return ret.toArray();
-        return null;
+        return ret.toArray();
     }
 
     public Class[] getParams(int count){
@@ -87,7 +89,6 @@ public class FrontServlet extends HttpServlet{
         if(urlMapping.containsKey(url)){
             try {
                 Object act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
-
                 List<String> params = parameter(req, url);
                 for (String s : params) {
                     Method m = act.getClass().getDeclaredMethod("set" + capitalize(s), Object.class);
@@ -128,6 +129,8 @@ public class FrontServlet extends HttpServlet{
         boolean exists = false;
         Part filepart = null;
         for( Part part : files ){
+            String contentDisposition = part.getHeader("content-disposition");
+            System.out.println(contentDisposition);
             if(part.getName().equals(name) ){
                 filepart = part;
                 exists = true;
@@ -152,6 +155,7 @@ public class FrontServlet extends HttpServlet{
 
     private String fileName(Part part) {
         String contentDisposition = part.getHeader("content-disposition");
+        System.out.println(contentDisposition);
         String[] parts = contentDisposition.split(";");
         for (String partStr : parts) {
             if (partStr.trim().startsWith("filename"))

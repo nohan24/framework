@@ -1,10 +1,6 @@
 <%@ page import ="java.util.List" %>
     <%@ page import ="model.Emp" %>
-        <%
-    int lst = (int)request.getAttribute("lst");
-    String name = request.getAttribute("name").toString();
-    out.print(name);
-%>
+        <% %>
             <!DOCTYPE html>
             <html lang="en">
 
@@ -17,10 +13,7 @@
 
             <body>
                 <h1>Hello World !!!!!</h1>
-                <%  
-    
-        out.print(lst);
-    %>
+
             </body>
 
             </html>
