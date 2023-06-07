@@ -12,7 +12,8 @@ copy D:\ITU_S4\framework\fw.jar D:\ITU_S4\framework\test-framework\WEB-INF\lib\f
 cd ../../test-framework/src
 javac -d  ../WEB-INF/classes model/*.java
 cd ..
+mkdir files
 jar -cvf D:/Tomcat/webapps/test-framework.war *
 cd ..
-
+    
 
