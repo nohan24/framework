@@ -12,6 +12,19 @@ import etu2075.framework.ModelView;
 public class Emp {
     String nom;
     FileUpload fu;
+    int stack = 0;
+
+    public int getStack() {
+        return stack;
+    }
+
+    public void setStack(Object stack) {
+        int st = 0;
+        if (stack != null) {
+            st = Integer.parseInt(stack.toString());
+        }
+        this.stack = st;
+    }
 
     public String getNom() {
         return nom;

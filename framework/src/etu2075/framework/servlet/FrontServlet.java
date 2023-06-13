@@ -5,6 +5,7 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 
 import etu2075.FileUpload;
+import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
 import etu2075.annotation.Url;
 import etu2075.framework.Mapping;
@@ -13,15 +14,36 @@ import utils.PackageTool;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> urlMapping = new HashMap<>();
     HashMap<String, Object> singleton = new HashMap<>();
+    String session, profil;
+
+    private boolean checkAuth(HttpServletRequest request, Method method) {
+        Auth authentification = method.getAnnotation(Auth.class);
+        if (!method.isAnnotationPresent(Auth.class))
+            return false;
+        if (request.getSession().getAttribute(session) == null)
+            return false;
+        if (((boolean) request.getSession().getAttribute(session)) == false)
+            return false;
+
+        String type = "";
+        if (request.getSession().getAttribute(profil) != null) {
+            type = request.getSession().getAttribute(profil).toString();
+        }
+        if (!authentification.type().equals(type))
+            return false;
+        return true;
+    }
 
     @Override
     public void init() throws ServletException {
@@ -37,6 +59,8 @@ public class FrontServlet extends HttpServlet {
                     }
                 }
             }
+            session = getServletConfig().getInitParameter("session");
+            profil = getServletConfig().getInitParameter("profil");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,9 +114,10 @@ public class FrontServlet extends HttpServlet {
     }
 
     protected void reset(Object obj) throws Exception {
+        Method m = null;
         for (Field f : obj.getClass().getDeclaredFields()) {
-            Method m = obj.getClass().getDeclaredMethod("set" + capitalize(f.getName()), Object.class);
-            m.invoke(obj, null);
+            m = obj.getClass().getDeclaredMethod("set" + capitalize(f.getName()), Object.class);
+            m.invoke(obj);
         }
     }
 
@@ -106,6 +131,11 @@ public class FrontServlet extends HttpServlet {
                 Object act = null;
                 if (singleton.get(urlMapping.get(url).getClassName()) != null) {
                     act = singleton.get(urlMapping.get(url).getClassName());
+                    Method m = act.getClass().getDeclaredMethod("setStack", Object.class);
+                    Method a = act.getClass().getDeclaredMethod("getStack");
+                    int d = Integer.parseInt(a.invoke(act).toString()) + 1;
+                    m.invoke(act, d);
+                    System.out.println(d);
                 } else {
                     act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
                 }
@@ -122,7 +152,11 @@ public class FrontServlet extends HttpServlet {
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key, mv.getMv().get(key));
                 }
-
+                if (mv._session()) {
+                    for (String key : mv.getSession().keySet()) {
+                        req.getSession().setAttribute(key, mv.getSession().get(key));
+                    }
+                }
                 try {
                     Collection<Part> parts = req.getParts();
                     if (parts.size() > 0) {

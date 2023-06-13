@@ -15,6 +15,14 @@
             <param-name>model</param-name>
             <param-value>model</param-value>
         </init-param>
+        <init-param>
+            <param-name>session</param-name>
+            <param-value>session</param-value>
+        </init-param>
+         <init-param>
+            <param-name>profil</param-name>
+            <param-value>profil</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>FrontServlet</servlet-name>
