@@ -4,22 +4,23 @@ import javax.servlet.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 
+import org.json.simple.JSONArray;
+
 import etu2075.FileUpload;
 import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
 import etu2075.annotation.Url;
+import etu2075.annotation.restAPI;
 import etu2075.framework.Mapping;
 import etu2075.framework.ModelView;
 import utils.PackageTool;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
@@ -135,7 +136,6 @@ public class FrontServlet extends HttpServlet {
                     Method a = act.getClass().getDeclaredMethod("getStack");
                     int d = Integer.parseInt(a.invoke(act).toString()) + 1;
                     m.invoke(act, d);
-                    System.out.println(d);
                 } else {
                     act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
                 }
@@ -149,6 +149,11 @@ public class FrontServlet extends HttpServlet {
                                 getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
                         .invoke(act, check_params(act, urlMapping.get(url).getMethod(), req));
                 mv.getMv().put("obj", act);
+                if (act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod(),
+                        getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
+                        .isAnnotationPresent(restAPI.class)) {
+                    mv.setJson(true);
+                }
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key, mv.getMv().get(key));
                 }
@@ -174,9 +179,14 @@ public class FrontServlet extends HttpServlet {
                 } catch (Exception e) {
                     out.println(e);
                 }
-
-                RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
-                requestDispatcher.forward(req, res);
+                if (!mv.isJson()) {
+                    RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
+                    requestDispatcher.forward(req, res);
+                } else {
+                    List<HashMap<String, Object>> dt = (List<HashMap<String, Object>>) mv.getMv().get("data");
+                    JSONArray j = new JSONArray(dt);
+                    out.println();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -185,20 +195,11 @@ public class FrontServlet extends HttpServlet {
 
     protected void writeFile(File file, byte[] bytes) {
         try {
-
-            // Initialize a pointer in file
-            // using OutputStream
             OutputStream os = new FileOutputStream(file);
-
-            // Starting writing the bytes in it
             os.write(bytes);
-
-            // Display message onconsole for successful
-            // execution
             System.out.println("Successfully"
                     + " byte inserted");
 
-            // Close the file connections
             os.close();
         } catch (Exception e) {
             System.out.println(e.getMessage());
