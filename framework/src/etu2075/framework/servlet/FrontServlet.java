@@ -5,6 +5,7 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import etu2075.FileUpload;
 import etu2075.annotation.Auth;
@@ -177,15 +178,19 @@ public class FrontServlet extends HttpServlet {
                         }
                     }
                 } catch (Exception e) {
-                    out.println(e);
+                    System.out.println(e);
                 }
                 if (!mv.isJson()) {
                     RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
                     requestDispatcher.forward(req, res);
                 } else {
                     List<HashMap<String, Object>> dt = (List<HashMap<String, Object>>) mv.getMv().get("data");
-                    JSONArray j = new JSONArray(dt);
-                    out.println();
+                    JSONArray j = new JSONArray();
+                    for (HashMap<String, Object> hash : dt) {
+                        JSONObject jObject = new JSONObject(hash);
+                        j.add(jObject);
+                    }
+                    out.println(j.toString());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
