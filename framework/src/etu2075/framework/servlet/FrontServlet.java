@@ -30,18 +30,13 @@ public class FrontServlet extends HttpServlet {
     String session, profil;
 
     private boolean checkAuth(HttpServletRequest request, Method method) {
-        Auth authentification = method.getAnnotation(Auth.class);
-        if (!method.isAnnotationPresent(Auth.class))
-            return false;
         if (request.getSession().getAttribute(session) == null)
             return false;
-        if (((boolean) request.getSession().getAttribute(session)) == false)
-            return false;
-
         String type = "";
         if (request.getSession().getAttribute(profil) != null) {
             type = request.getSession().getAttribute(profil).toString();
         }
+        Auth authentification = method.getAnnotation(Auth.class);
         if (!authentification.type().equals(type))
             return false;
         return true;
@@ -68,6 +63,7 @@ public class FrontServlet extends HttpServlet {
         }
     }
 
+    // get all parameters by class field
     private List<String> parameter(HttpServletRequest req, String cl)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         Object act = Class.forName(urlMapping.get(cl).getClassName()).newInstance();
@@ -86,6 +82,7 @@ public class FrontServlet extends HttpServlet {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    // check url from link
     public Object[] check_params(Object obj, String met, HttpServletRequest req) {
         ArrayList<Object> ret = new ArrayList<>();
         for (Method m : obj.getClass().getDeclaredMethods()) {
@@ -115,6 +112,7 @@ public class FrontServlet extends HttpServlet {
         return null;
     }
 
+    // reset singleton object attribute
     protected void reset(Object obj) throws Exception {
         Method m = null;
         for (Field f : obj.getClass().getDeclaredFields()) {
@@ -126,11 +124,14 @@ public class FrontServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("text/plain");
         PrintWriter out = res.getWriter();
+        // get the url
         String url = req.getRequestURI();
         url = url.split("/")[url.split("/").length - 1];
+        // check if urlmapping contains the current url
         if (urlMapping.containsKey(url)) {
             try {
                 Object act = null;
+                // singleton
                 if (singleton.get(urlMapping.get(url).getClassName()) != null) {
                     act = singleton.get(urlMapping.get(url).getClassName());
                     Method m = act.getClass().getDeclaredMethod("setStack", Object.class);
@@ -140,29 +141,50 @@ public class FrontServlet extends HttpServlet {
                 } else {
                     act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
                 }
+                // get parameter by the object field's name
                 List<String> params = parameter(req, url);
                 for (String s : params) {
                     Method m = act.getClass().getDeclaredMethod("set" + capitalize(s), Object.class);
                     m.invoke(act, req.getParameter(s));
                 }
-                ModelView mv = (ModelView) act.getClass()
+
+                // method from url
+                Method curr_method = act.getClass()
                         .getDeclaredMethod(urlMapping.get(url).getMethod(),
-                                getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
-                        .invoke(act, check_params(act, urlMapping.get(url).getMethod(), req));
+                                getParams(check_params(act, urlMapping.get(url).getMethod(), req).length));
+
+                // check if the method need authentification
+                if (curr_method.isAnnotationPresent(Auth.class)) {
+                    if (!checkAuth(req, curr_method)) {
+                        throw new Exception("Need authentification");
+                    }
+                }
+
+                // initialize the modelview from the called method
+                ModelView mv = (ModelView) curr_method.invoke(act,
+                        check_params(act, urlMapping.get(url).getMethod(), req));
+                // put the object in the modelview's map called mv
                 mv.getMv().put("obj", act);
+
+                // check if the method should return a json format
                 if (act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod(),
                         getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
                         .isAnnotationPresent(restAPI.class)) {
                     mv.setJson(true);
                 }
+
+                // send the data in the httpserveltrequest's attribute
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key, mv.getMv().get(key));
                 }
+
+                // initialize session from the modelview session's map
                 if (mv._session()) {
                     for (String key : mv.getSession().keySet()) {
                         req.getSession().setAttribute(key, mv.getSession().get(key));
                     }
                 }
+                // upload file
                 try {
                     Collection<Part> parts = req.getParts();
                     if (parts.size() > 0) {

@@ -41,6 +41,6 @@ public class ModelView {
     }
 
     public boolean _session() {
-        return session != null;
+        return session.size() != 0;
     }
 }
