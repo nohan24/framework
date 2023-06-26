@@ -24,6 +24,6 @@ cd ../test-fw
 copy D:\ITU_S4\framework\test-framework\*.jsp D:\ITU_S4\framework\test-framework\test-fw\*.jsp
 jar -cvf D:/Tomcat/webapps/test-fw.war *
 cd D:\ITU_S4\framework\test-framework
-
+rmdir /s /q test-fw
     
 
