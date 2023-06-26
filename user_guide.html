@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <title>Guide d'utilisation</title>
+</head>
+
+<style>
+    @font-face {
+        font-family: Roboto;
+        src: url("style/RobotoSlab-Medium.ttf");
+    }
+    
+    * {
+        color: #333;
+        scroll-behavior: smooth;
+    }
+    
+    h2,
+    h3 {
+        font-family: Roboto;
+    }
+    
+    li {
+        font-size: 17px;
+    }
+    
+    a {
+        color: #dd4814;
+        text-decoration: none;
+    }
+    
+    a:hover {
+        color: #c54415;
+    }
+    
+    object {
+        width: 100%;
+        background-color: #cfcdcd;
+        height: 250px;
+        border-radius: 6px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h2 class="py-3">Framework - Guide d'utilisation</h2>
+        <div class="list-group mb-3">
+            <ul class="px-4 list-group">
+                <li>
+                    <a href="#requirements">Requirements</a>
+                </li>
+                <li>
+                    <a href="#installation">Installation</a>
+                </li>
+                <li>
+                    <a href="#utilisation">Utilisation</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="mb-3" id="requirements">
+            <h3>Requirements</h3>
+            <ul style="list-style-type:square;" class=" px-4 list-group ">
+                <li>
+                    Minimum Java 17
+                </li>
+            </ul>
+        </div>
+
+        <div class="mb-3" id="installation">
+            <h3>Installation</h3>
+            <ol class=" px-4 list-group ">
+                <li>
+                    Intégrer le framework à votre variable d'environnement
+                </li>
+                <li>
+                    Dans le fichier web.xml contenu dans votre dossier WEB-INF, insérez la partie suivante : <br>
+                    <div>
+                        <object class="mt-3 p-3" data="xml.txt"></object>
+                    </div>
+                    <ul style="list-style-type:square;" class=" px-4 list-group ">
+                        <li>
+                            param-value : le texte contenu dans la balise param-value sera le nom de votre package pour vos models dans le dossier class de votre projet
+                        </li>
+                    </ul>
+                </li>
+
+            </ol>
+        </div>
+
+        <div class="mb-3" id="utilisation">
+            <h3>Utilisation</h3>
+            <ol class=" px-4 list-group ">
+                <li>
+                    Les Liens: <br> ex: http://link/class-functiontocall <br>
+                    <ul class=" px-4 list-group ">
+                        <li>
+                            class-functiontocall: <br> class : la classe en question <br> functiontocall : fonction contenue dans la classe "class" qui retourne un ModelView ( classe contenue dans le framework )
+                        </li>
+                        <li>
+                            ModelView : <br>
+                            <object class="mt-3 p-3" data="mv.txt"></object>
+                            <ul style="list-style-type:square;" class=" px-4 list-group ">
+                                <li>
+                                    HashMap(String,Object) mv : pour envoyer des donners dans votre vue. Pour récupérer les données, on fait appelle request.getAttribute(key) ( key : meme clé que dans l'hashmap et il suffit de caster l'objet correspondant à cette clé )
+                                </li>
+                                <li>
+                                    String view : le nom du fichier .jsp de votre vue . ex:(list.jsp)
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            Annotation des fonctions : <br>
+                            <ul style="list-style-type:square;" class=" px-4 list-group ">
+                                <li>
+                                    Annoter les fonctions utilisées dans les liens par la classe Url qui prend deux parametres ( String url : pour matcher l'url et la fonction ; String[] params : peut-être null, on met dedans les noms exactes des paramètres si il y en a )
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Envoi de données:
+                    <p>On a déjà vu au-dessus comment envoyer des données par les liens, voyons comment on fait pour les formulaires.</p>
+                    <span>Pour les formulaires, l'action pointe toujours vers le lien du style class-fonction, pour les données, le nom données aux input doivent-êtres de même que celui des attributs de la classe visée.</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+</html>

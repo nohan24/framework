@@ -1,0 +1,12 @@
+<servlet>
+    <servlet-name>FrontServlet</servlet-name>
+    <servlet-class>etu2075.framework.servlet.FrontServlet</servlet-class>
+    <init-param>
+        <param-name>model</param-name>
+        <param-value>package_de_vos_objets</param-value>
+    </init-param>
+</servlet>
+<servlet-mapping>
+    <servlet-name>FrontServlet</servlet-name>
+    <url-pattern>/</url-pattern> 
+</servlet-mapping>

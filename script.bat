@@ -9,7 +9,11 @@ jar -cvf D:\ITU_S4\framework\fw.jar *
 copy D:\ITU_S4\framework\fw.jar D:\Tomcat\lib\fw.jar
 copy D:\ITU_S4\framework\fw.jar D:\ITU_S4\framework\test-framework\WEB-INF\lib\fw.jar
 cd ../../test-framework/src
+javac -d ../classes 
+mkdir tmp
+mkdir WEB-INF
 javac -d  ../WEB-INF/classes model/*.java
 cd ..
+dir
 jar -cvf D:/Tomcat/webapps/test-framework.war *
 cd ..
