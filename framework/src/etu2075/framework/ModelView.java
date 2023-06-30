@@ -8,6 +8,15 @@ public class ModelView {
     HashMap<String, Object> session = new HashMap<>();
     boolean isJson = false;
     boolean invalidateSession = false;
+    boolean _session = false;
+
+    public boolean is_session() {
+        return _session;
+    }
+
+    public void set_session(boolean _session) {
+        this._session = _session;
+    }
 
     public boolean isInvalidateSession() {
         return invalidateSession;
@@ -47,9 +56,5 @@ public class ModelView {
 
     public void setView(String view) {
         this.view = view;
-    }
-
-    public boolean _session() {
-        return session.size() != 0;
     }
 }

@@ -3,14 +3,13 @@ package model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 import etu2075.FileUpload;
+import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
 import etu2075.annotation.Url;
-import etu2075.annotation.restAPI;
+import etu2075.annotation.*;
 import etu2075.framework.ModelView;
 
 @Scope("singleton")
@@ -74,11 +73,17 @@ public class Emp {
             dt.put("age", i);
             data.add(dt);
         }
+        HashMap<String, Object> session = new HashMap<>();
+        session.put("profil", "admin");
+        session.put("session", "JS");
+        mv.setSession(session);
         hash.put("data", data);
+        mv.set_session(true);
         mv.setMv(hash);
         return mv;
     }
 
+    @Auth(type = "admin")
     @Url(url = "emp-insert", params = {})
     public ModelView insert() {
         ModelView mv = new ModelView();

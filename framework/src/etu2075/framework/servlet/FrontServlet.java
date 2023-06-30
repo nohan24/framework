@@ -178,9 +178,9 @@ public class FrontServlet extends HttpServlet {
                 }
 
                 // initialize session from the modelview session's map
-                if (mv._session()) {
+                if (mv.is_session()) {
                     for (String key : mv.getSession().keySet()) {
-                        req.getSession().setAttribute(key, mv.getSession().get(key));
+                        req.getSession().setAttribute(key, mv.getSession().get(key).toString());
                     }
                 }
                 // upload file
@@ -204,6 +204,7 @@ public class FrontServlet extends HttpServlet {
 
                 // delete session
                 if (mv.isInvalidateSession()) {
+                    System.out.println("mamafa sessionn");
                     req.getSession().invalidate();
                 }
 
