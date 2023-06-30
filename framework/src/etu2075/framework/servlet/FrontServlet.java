@@ -6,7 +6,6 @@ import javax.servlet.http.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 import etu2075.FileUpload;
 import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
@@ -202,6 +201,12 @@ public class FrontServlet extends HttpServlet {
                 } catch (Exception e) {
                     System.out.println(e);
                 }
+
+                // delete session
+                if (mv.isInvalidateSession()) {
+                    req.getSession().invalidate();
+                }
+
                 if (!mv.isJson()) {
                     RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
                     requestDispatcher.forward(req, res);
