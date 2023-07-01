@@ -208,6 +208,13 @@ public class FrontServlet extends HttpServlet {
                     req.getSession().invalidate();
                 }
 
+                // delete specific session
+                if (mv.getRemoveSession().size() > 0) {
+                    for (String s : mv.getRemoveSession()) {
+                        req.getSession().setAttribute(s, null);
+                    }
+                }
+
                 if (!mv.isJson()) {
                     RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
                     requestDispatcher.forward(req, res);

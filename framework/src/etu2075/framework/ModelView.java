@@ -1,6 +1,8 @@
 package etu2075.framework;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ModelView {
     String view;
@@ -9,6 +11,15 @@ public class ModelView {
     boolean isJson = false;
     boolean invalidateSession = false;
     boolean _session = false;
+    List<String> removeSession = new ArrayList<>();
+
+    public List<String> getRemoveSession() {
+        return removeSession;
+    }
+
+    public void setRemoveSession(List<String> removeSession) {
+        this.removeSession = removeSession;
+    }
 
     public boolean is_session() {
         return _session;

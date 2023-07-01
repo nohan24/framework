@@ -3,8 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import etu2075.FileUpload;
 import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
