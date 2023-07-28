@@ -3,6 +3,7 @@
     "lib/**/*.jar",
     "d:\\lib\\servlet-api.jar",
     "fw.jar",
-    "c:\\Users\\Nohan\\Downloads\\json-simple-1.1.1.jar"
+    "c:\\Users\\Nohan\\Downloads\\json-simple-1.1.1.jar",
+    "d:\\lib\\json-simple-1.1.1.jar"
   ]
 }

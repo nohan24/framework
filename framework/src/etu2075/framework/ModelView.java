@@ -11,6 +11,16 @@ public class ModelView {
     boolean isJson = false;
     boolean invalidateSession = false;
     boolean _session = false;
+    boolean isXml = false;
+
+    public boolean isXml() {
+        return isXml;
+    }
+
+    public void setXml(boolean isXml) {
+        this.isXml = isXml;
+    }
+
     List<String> removeSession = new ArrayList<>();
 
     public List<String> getRemoveSession() {

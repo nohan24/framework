@@ -3,13 +3,25 @@ package etu2075.framework.servlet;
 import javax.servlet.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
+import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import etu2075.FileUpload;
 import etu2075.annotation.Auth;
 import etu2075.annotation.Scope;
 import etu2075.annotation.Url;
+import etu2075.annotation.Xml;
 import etu2075.annotation.restAPI;
 import etu2075.framework.Mapping;
 import etu2075.framework.ModelView;
@@ -140,10 +152,14 @@ public class FrontServlet extends HttpServlet {
                 } else {
                     act = Class.forName(urlMapping.get(url).getClassName()).newInstance();
                 }
+
                 // get parameter by the object field's name
                 List<String> params = parameter(req, url);
                 for (String s : params) {
+                    if (s == "fu")
+                        continue;
                     Method m = act.getClass().getDeclaredMethod("set" + capitalize(s), Object.class);
+                    System.out.println(req.getParameter(s));
                     m.invoke(act, req.getParameter(s));
                 }
 
@@ -155,6 +171,7 @@ public class FrontServlet extends HttpServlet {
                 // check if the method need authentification
                 if (curr_method.isAnnotationPresent(Auth.class)) {
                     if (!checkAuth(req, curr_method)) {
+                        System.out.println("authentification");
                         throw new Exception("Need authentification");
                     }
                 }
@@ -172,6 +189,12 @@ public class FrontServlet extends HttpServlet {
                     mv.setJson(true);
                 }
 
+                if (act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod(),
+                        getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
+                        .isAnnotationPresent(Xml.class)) {
+                    mv.setXml(true);
+                }
+
                 // send the data in the httpserveltrequest's attribute
                 for (String key : mv.getMv().keySet()) {
                     req.setAttribute(key, mv.getMv().get(key));
@@ -185,20 +208,24 @@ public class FrontServlet extends HttpServlet {
                 }
                 // upload file
                 try {
+                    System.out.println("hahahaha");
                     Collection<Part> parts = req.getParts();
                     if (parts.size() > 0) {
                         for (Field f : act.getClass().getDeclaredFields()) {
                             if (f.getType() == etu2075.FileUpload.class) {
+                                System.out.println("haha");
                                 Method m = act.getClass().getDeclaredMethod("setFu", f.getType());
                                 FileUpload file = fileTraitement(parts, f);
+                                System.out.println(file.getName());
                                 m.invoke(act, file);
-                                File d = new File("D:/Tomcat/webapps/test-framework/files/" + file.getName());
+                                File d = new File("D:/Tomcat/webapps/evaluation/files/" + file.getName());
                                 d.createNewFile();
                                 writeFile(d, file.getBytes());
                             }
                         }
                     }
                 } catch (Exception e) {
+                    System.out.println("etos");
                     System.out.println(e);
                 }
 
@@ -216,8 +243,31 @@ public class FrontServlet extends HttpServlet {
                 }
 
                 if (!mv.isJson()) {
+                    res.setContentType("application/json");
+
                     RequestDispatcher requestDispatcher = req.getRequestDispatcher(mv.getView());
                     requestDispatcher.forward(req, res);
+                }
+                if (mv.isXml()) {
+                    res.setContentType("text/xml");
+                    List<HashMap<String, Object>> dt = (List<HashMap<String, Object>>) mv.getMv().get("data");
+                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                    String wrapper = act.getClass().getDeclaredMethod(urlMapping.get(url).getMethod(),
+                            getParams(check_params(act, urlMapping.get(url).getMethod(), req).length))
+                            .getAnnotation(Xml.class).wrap();
+                    Document doc = (javax.swing.text.Document) docBuilder.newDocument();
+                    for (HashMap<String, Object> hashMap : dt) {
+                        Element rootElement = ((org.w3c.dom.Document) doc).createElement(wrapper);
+                        ((Node) doc).appendChild(rootElement);
+
+                        for (String s : hashMap.keySet()) {
+                            ((org.w3c.dom.Document) doc).createElement(s);
+                            rootElement.appendChild(((org.w3c.dom.Document) doc).createElement(s));
+                        }
+
+                    }
+                    out.print(doc.toString());
                 } else {
                     List<HashMap<String, Object>> dt = (List<HashMap<String, Object>>) mv.getMv().get("data");
                     JSONArray j = new JSONArray();
